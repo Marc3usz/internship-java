@@ -1,4 +1,4 @@
-package com.technischools.marcel;
+package com.technischools.marcel.order;
 
 import jakarta.persistence.*;
 
