@@ -1,5 +1,8 @@
-package com.technischools.marcel.order;
+package com.technischools.marcel.order.service;
 
+import com.technischools.marcel.order.model.Order;
+import com.technischools.marcel.order.model.OrderStatus;
+import com.technischools.marcel.order.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;

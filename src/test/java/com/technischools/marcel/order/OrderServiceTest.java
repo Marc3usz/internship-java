@@ -3,6 +3,10 @@ package com.technischools.marcel.order;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.technischools.marcel.order.model.Order;
+import com.technischools.marcel.order.model.OrderStatus;
+import com.technischools.marcel.order.repository.OrderRepository;
+import com.technischools.marcel.order.service.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +40,6 @@ public class OrderServiceTest {
         sampleOrder.setProducts(Arrays.asList("Product1", "Product2"));
     }
 
-    // ✅ TEST: Create Order with Null Values
     @Test
     void testCreateOrder_WithNullValues_SetsDefaults() {
         Order order = new Order(); // Empty order (null values)
@@ -51,7 +54,6 @@ public class OrderServiceTest {
         verify(orderRepository, times(1)).save(any(Order.class));
     }
 
-    // ✅ TEST: Create Order with Custom Values
     @Test
     void testCreateOrder_WithCustomValues() {
         Order order = new Order();
@@ -69,7 +71,6 @@ public class OrderServiceTest {
         verify(orderRepository, times(1)).save(order);
     }
 
-    // ✅ TEST: Get Orders by Status
     @Test
     void testGetOrders_ByStatus_ReturnsFilteredOrders() {
         Order order2 = new Order();
@@ -88,7 +89,6 @@ public class OrderServiceTest {
         verify(orderRepository, times(1)).findAll();
     }
 
-    // ✅ TEST: Get Order by Non-Existing ID
     @Test
     void testGetOrders_NonExistingId_ReturnsEmptyList() {
         when(orderRepository.findById(99L)).thenReturn(Optional.empty());
@@ -99,7 +99,29 @@ public class OrderServiceTest {
         verify(orderRepository, times(1)).findById(99L);
     }
 
-    // ✅ TEST: Patch Order - Update Only Status
+    @Test
+    void testGetOrders_ByIdAndStatus_MatchingStatus_ReturnsOrder() {
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(sampleOrder));
+
+        List<Order> result = orderService.getOrders(Optional.of(1L), Optional.of(OrderStatus.NOWE));
+
+        assertEquals(1, result.size());
+        assertEquals(1L, result.get(0).getId());
+        assertEquals(OrderStatus.NOWE, result.get(0).getStatus());
+
+        verify(orderRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void testGetOrders_ByIdAndStatus_NonMatchingStatus_ReturnsEmptyList() {
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(sampleOrder));
+
+        List<Order> result = orderService.getOrders(Optional.of(1L), Optional.of(OrderStatus.ZAKONCZONE));
+
+        assertTrue(result.isEmpty());
+        verify(orderRepository, times(1)).findById(1L);
+    }
+
     @Test
     void testPatchOrder_UpdateOnlyStatus() {
         when(orderRepository.findById(1L)).thenReturn(Optional.of(sampleOrder));
@@ -113,7 +135,6 @@ public class OrderServiceTest {
         verify(orderRepository, times(1)).save(sampleOrder);
     }
 
-    // ✅ TEST: Patch Order - Update Only Products
     @Test
     void testPatchOrder_UpdateOnlyProducts() {
         when(orderRepository.findById(1L)).thenReturn(Optional.of(sampleOrder));
@@ -129,7 +150,6 @@ public class OrderServiceTest {
         verify(orderRepository, times(1)).save(sampleOrder);
     }
 
-    // ✅ TEST: Patch Order - Order Not Found
     @Test
     void testPatchOrder_OrderNotFound_ReturnsNull() {
         when(orderRepository.findById(99L)).thenReturn(Optional.empty());
@@ -140,7 +160,6 @@ public class OrderServiceTest {
         verify(orderRepository, never()).save(any(Order.class));
     }
 
-    // ✅ TEST: Delete Non-Existing Order
     @Test
     void testDeleteOrder_NonExistingId_NoError() {
         doNothing().when(orderRepository).deleteById(99L);
@@ -150,7 +169,6 @@ public class OrderServiceTest {
         verify(orderRepository, times(1)).deleteById(99L);
     }
 
-    // ✅ TEST: Get All Orders When None Exist
     @Test
     void testGetOrders_NoOrders_ReturnsEmptyList() {
         when(orderRepository.findAll()).thenReturn(Collections.emptyList());

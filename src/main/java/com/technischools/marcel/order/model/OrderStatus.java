@@ -1,4 +1,4 @@
-package com.technischools.marcel.order;
+package com.technischools.marcel.order.model;
 
 import java.util.Optional;
 
